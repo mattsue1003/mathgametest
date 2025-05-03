@@ -287,6 +287,7 @@
     const btn = document.createElement("button");
     btn.className = "btn";
     btn.textContent = i;
+    btn.disabled = false;
     btn.addEventListener("click", () => {
       const answer = parseInt(btn.textContent);
       if (!gameStarted) {
@@ -331,9 +332,15 @@
     }
 
     function backToHome() {
-      gameEl.classList.remove("active");
-      homeEl.classList.add("active");
-    }
+  gameEl.classList.remove("active");
+  homeEl.classList.add("active");
+  gameStarted = false;
+  clearInterval(timer);
+  timeLeft = 30;
+  correctCount = 0;
+  questionEl.textContent = "請按任一數字鍵開始";
+  infoEl.textContent = `剩餘時間：30 秒｜答對：0 題`;
+}
 
     // 已改為動態按鈕綁定，因此不再需要舊的 click 綁定程式碼區塊
 
