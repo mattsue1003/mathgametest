@@ -143,6 +143,9 @@
 你有 30 秒的時間，
 盡可能針對題目回答正確的數字，
 題目有加法、減法、乘法或除法（答案僅限 1~9）。
+
+📗 簡單：題目數字 1~9，運算較簡單
+📕 困難：題目數字可達 1-12，乘除題型更多
 </p>
     <div id="history">
       <table id="recordTable">
@@ -154,8 +157,7 @@
   <p style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;">請選擇難度</p>
   <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
     <button class="start-btn" style="background-color: #66ff66;" onclick="setDifficulty('easy')">🟢 簡單</button>
-    <button class="start-btn" style="background-color: #ffcc00;" onclick="setDifficulty('medium')">🟡 普通</button>
-    <button class="start-btn" style="background-color: #ff6666;" onclick="setDifficulty('hard')">🔴 困難</button>
+        <button class="start-btn" style="background-color: #ff6666;" onclick="setDifficulty('hard')">🔴 困難</button>
   </div>
 </div>
 </div>
@@ -215,39 +217,35 @@
   let a, b;
 
   const isHard = window.difficulty === 'hard';
-  const isMedium = window.difficulty === 'medium';
-
-  const max = isHard ? 20 : isMedium ? 10 : 9;
+  const max = isHard ? 12 : 9;
   const min = 1;
 
   if (operator === '+') {
-    a = Math.floor(Math.random() * max) + min;
-    b = Math.floor(Math.random() * max) + min;
+    a = Math.floor(Math.random() * (max - min + 1)) + min;
+    b = Math.floor(Math.random() * (max - min + 1)) + min;
     currentAnswer = a + b;
   } else if (operator === '-') {
-    a = Math.floor(Math.random() * max) + min;
-    b = Math.floor(Math.random() * max) + min;
+    a = Math.floor(Math.random() * (max - min + 1)) + min;
+    b = Math.floor(Math.random() * (max - min + 1)) + min;
     if (a < b) [a, b] = [b, a];
     currentAnswer = a - b;
   } else if (operator === '×') {
-    a = Math.floor(Math.random() * (isHard ? 10 : 5)) + 1;
-    b = Math.floor(Math.random() * (isHard ? 10 : 5)) + 1;
+    a = Math.floor(Math.random() * (isHard ? 12 : 5)) + 1;
+    b = Math.floor(Math.random() * (isHard ? 12 : 5)) + 1;
     currentAnswer = a * b;
   } else if (operator === '÷') {
-    b = Math.floor(Math.random() * (isHard ? 9 : 5)) + 1;
-    currentAnswer = Math.floor(Math.random() * (isHard ? 10 : 5)) + 1;
+    b = Math.floor(Math.random() * (isHard ? 8 : 4)) + 1 + 1;
+    currentAnswer = Math.floor(Math.random() * 9) + 1;
     a = b * currentAnswer;
   }
 
   if (currentAnswer < 1 || currentAnswer > 9) {
-    generateQuestion();
-    return;
-  }
+  generateQuestion();
+  return;
+}
 
   questionEl.textContent = `${a} ${operator} ${b} = ?`;
 }
-      questionEl.textContent = `${a} ${isAddition ? "+" : "-"} ${b} = ?`;
-    }
 
     function setDifficulty(level) {
   window.difficulty = level;
@@ -288,10 +286,11 @@
     buttons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const answer = parseInt(btn.textContent);
-        if (!gameStarted) {
+        if (!gameStarted && timeLeft > 0) {
           startGame();
           return;
         }
+        if (!gameStarted || timeLeft <= 0) return;
         if (answer === currentAnswer) {
           correctCount++;
           dingSound.play();
