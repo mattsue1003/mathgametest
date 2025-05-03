@@ -35,14 +35,18 @@
       font-size: 1em;
       margin: 1em 0;
       color: #ccc;
+      text-align: center;
     }
     #question {
-      font-size: 3em;
+      font-size: 2.5em;
       background: #1c1c1c;
       border-radius: 15px;
-      padding: 20px 40px;
+      padding: 10px 20px;
       margin-bottom: 20px;
       box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+      word-break: keep-all;
+      text-align: center;
+      max-width: 90vw;
     }
     #info {
       font-size: 1.2em;
@@ -50,7 +54,7 @@
     }
     .num-buttons {
       display: grid;
-      grid-template-columns: repeat(3, 80px);
+      grid-template-columns: repeat(3, minmax(60px, 80px));
       gap: 15px;
       justify-content: center;
       margin-bottom: 30px;
