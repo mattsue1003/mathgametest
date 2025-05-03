@@ -37,6 +37,19 @@
       color: #ccc;
       text-align: center;
     }
+    #recordTable {
+      border-collapse: collapse;
+      margin-bottom: 1em;
+    }
+    #recordTable td, #recordTable th {
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      text-align: center;
+    }
+    #recordTable th {
+      background: #333;
+      color: #fff;
+    }
     #question {
       font-size: 2.5em;
       background: #1c1c1c;
@@ -47,6 +60,14 @@
       word-break: keep-all;
       text-align: center;
       max-width: 90vw;
+    }
+    .flash {
+      animation: flash 1s ease-in-out 3;
+    }
+    @keyframes flash {
+      0% { color: #ff6666; }
+      50% { color: #ffffff; }
+      100% { color: #ff6666; }
     }
     #info {
       font-size: 1.2em;
@@ -78,6 +99,8 @@
     .end {
       color: #ff6666;
       font-size: 1.5em;
+      display: block;
+      white-space: pre-line;
     }
     .start-btn {
       font-size: 1.2em;
@@ -101,7 +124,12 @@
   <h1>速算對決</h1>
   <div id="home" class="active">
     <p>遊戲說明：你有 30 秒時間，盡可能多地回答正確的加減法題目（答案僅限 1~9）。</p>
-    <div id="history">近期答對紀錄：--｜--｜--｜最佳：--</div>
+    <div id="history">
+      <table id="recordTable">
+        <tr><th>近期紀錄</th><td id="recent1">--</td><td id="recent2">--</td><td id="recent3">--</td></tr>
+        <tr><th>最佳紀錄</th><td colspan="3" id="bestRecord">--</td></tr>
+      </table>
+    </div>
     <button class="start-btn" onclick="showGame()">開始遊戲</button>
   </div>
 
@@ -122,6 +150,8 @@
   </div>
   <footer>© 2025 速算對決</footer>
 
+  <audio id="ding" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-reward-952.mp3"></audio>
+
   <script>
     let timeLeft = 30;
     let correctCount = 0;
@@ -138,10 +168,14 @@
     const buttons = document.querySelectorAll(".btn");
     const homeEl = document.getElementById("home");
     const gameEl = document.getElementById("game");
+    const dingSound = document.getElementById("ding");
 
     function updateHistoryDisplay() {
-      const recent = [...history].slice(-3).reverse().map(v => `${v} 題`).join("｜") || "--";
-      historyEl.textContent = `近期答對紀錄：${recent}｜最佳：${maxRecord()} 題`;
+      const recent = [...history].slice(-3).reverse();
+      document.getElementById("recent1").textContent = recent[0] !== undefined ? `${recent[0]} 題` : "--";
+      document.getElementById("recent2").textContent = recent[1] !== undefined ? `${recent[1]} 題` : "--";
+      document.getElementById("recent3").textContent = recent[2] !== undefined ? `${recent[2]} 題` : "--";
+      document.getElementById("bestRecord").textContent = `${maxRecord()} 題`;
     }
 
     function generateQuestion() {
@@ -178,9 +212,13 @@
           history.push(correctCount);
           history = history.slice(-10);
           localStorage.setItem("history", JSON.stringify(history));
-          questionEl.innerHTML = `<span class='end'>時間到！你答對了 ${correctCount} 題！</span>`;
+          questionEl.innerHTML = `<span class='end flash'>時間到！\n你答對了 ${correctCount} 題！</span>`;
           updateHistoryDisplay();
           gameStarted = false;
+          setTimeout(() => {
+            gameEl.classList.remove("active");
+            homeEl.classList.add("active");
+          }, 3000);
         }
       }, 1000);
     }
@@ -194,6 +232,7 @@
         }
         if (answer === currentAnswer) {
           correctCount++;
+          dingSound.play();
         }
         generateQuestion();
         infoEl.textContent = `剩餘時間：${timeLeft} 秒｜答對：${correctCount} 題`;
