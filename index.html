@@ -231,6 +231,10 @@
     a = Math.floor(Math.random() * (max - min + 1)) + min;
     b = Math.floor(Math.random() * (max - min + 1)) + min;
     currentAnswer = a + b;
+    if ((isHard && currentAnswer < 10) || (!isHard && currentAnswer > 9)) {
+      generateQuestion();
+      return;
+    }
     if (isHard && currentAnswer < 10) {
       generateQuestion();
       return;
@@ -241,6 +245,10 @@
     b = Math.floor(Math.random() * (max - min + 1)) + min;
     if (a < b) [a, b] = [b, a];
     currentAnswer = a - b;
+    if ((isHard && currentAnswer < 10) || (!isHard && currentAnswer > 9)) {
+      generateQuestion();
+      return;
+    }
     if (isHard && currentAnswer < 10) {
       generateQuestion();
       return;
@@ -250,6 +258,10 @@
     a = Math.floor(Math.random() * (isHard ? 12 : 3)) + 1;
     b = Math.floor(Math.random() * (isHard ? 12 : 3)) + 1;
     currentAnswer = a * b;
+    if ((isHard && currentAnswer < 10) || (!isHard && currentAnswer > 9)) {
+      generateQuestion();
+      return;
+    }
     if (isHard && currentAnswer < 10) {
       generateQuestion();
       return;
@@ -257,7 +269,7 @@
 
   } else if (operator === '÷') {
     b = Math.floor(Math.random() * (isHard ? 8 : 4)) + 1;
-    const answerPool = isHard ? [10,11,12,1,2,3,4,5,6,7,8,9] : [1,2,3,4,5,6,7,8,9];
+    const answerPool = isHard ? [10,11,12,1,2,3,4,5,6,7,8,9] : [1,2,3,4,5,6,7,8,9]; // 保留但簡單模式本身已受限於 pool
     currentAnswer = answerPool[Math.floor(Math.random() * answerPool.length)];
     a = b * currentAnswer;
   }
