@@ -17,19 +17,25 @@
       min-height: 100vh;
       padding: 20px;
     }
-
     h1 {
       font-size: 2.5em;
       margin-top: 1em;
       margin-bottom: 0.3em;
     }
-
+    #home, #game {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    #home.active, #game.active {
+      display: flex;
+    }
     #history {
       font-size: 1em;
-      margin-bottom: 1em;
+      margin: 1em 0;
       color: #ccc;
     }
-
     #question {
       font-size: 3em;
       background: #1c1c1c;
@@ -38,12 +44,10 @@
       margin-bottom: 20px;
       box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
     }
-
     #info {
       font-size: 1.2em;
       margin-bottom: 20px;
     }
-
     .num-buttons {
       display: grid;
       grid-template-columns: repeat(3, 80px);
@@ -51,7 +55,6 @@
       justify-content: center;
       margin-bottom: 30px;
     }
-
     .btn {
       font-size: 1.8em;
       background-color: #00d1ff;
@@ -64,17 +67,24 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
     .btn:active {
       transform: scale(0.95);
       background-color: #00a3cc;
     }
-
     .end {
       color: #ff6666;
       font-size: 1.5em;
     }
-
+    .start-btn {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #00ffcc;
+      color: #000;
+      cursor: pointer;
+      margin-top: 20px;
+    }
     footer {
       margin-top: auto;
       font-size: 0.8em;
@@ -85,19 +95,26 @@
 </head>
 <body>
   <h1>速算對決</h1>
-  <div id="history">近期答對紀錄：--｜--｜--｜最佳：--</div>
-  <div id="question">請按任一數字鍵開始</div>
-  <div id="info">剩餘時間：30 秒｜答對：0 題</div>
-  <div class="num-buttons">
-    <button class="btn">1</button>
-    <button class="btn">2</button>
-    <button class="btn">3</button>
-    <button class="btn">4</button>
-    <button class="btn">5</button>
-    <button class="btn">6</button>
-    <button class="btn">7</button>
-    <button class="btn">8</button>
-    <button class="btn">9</button>
+  <div id="home" class="active">
+    <p>遊戲說明：你有 30 秒時間，盡可能多地回答正確的加減法題目（答案僅限 1~9）。</p>
+    <div id="history">近期答對紀錄：--｜--｜--｜最佳：--</div>
+    <button class="start-btn" onclick="showGame()">開始遊戲</button>
+  </div>
+
+  <div id="game">
+    <div id="question">請按任一數字鍵開始</div>
+    <div id="info">剩餘時間：30 秒｜答對：0 題</div>
+    <div class="num-buttons">
+      <button class="btn">1</button>
+      <button class="btn">2</button>
+      <button class="btn">3</button>
+      <button class="btn">4</button>
+      <button class="btn">5</button>
+      <button class="btn">6</button>
+      <button class="btn">7</button>
+      <button class="btn">8</button>
+      <button class="btn">9</button>
+    </div>
   </div>
   <footer>© 2025 速算對決</footer>
 
@@ -108,16 +125,19 @@
     let timer;
     let gameStarted = false;
     let history = JSON.parse(localStorage.getItem("history") || "[]");
-    const maxRecord = Math.max(...history, 0);
+
+    const maxRecord = () => Math.max(...history, 0);
 
     const questionEl = document.getElementById("question");
     const infoEl = document.getElementById("info");
     const historyEl = document.getElementById("history");
     const buttons = document.querySelectorAll(".btn");
+    const homeEl = document.getElementById("home");
+    const gameEl = document.getElementById("game");
 
     function updateHistoryDisplay() {
       const recent = [...history].slice(-3).reverse().map(v => `${v} 題`).join("｜") || "--";
-      historyEl.textContent = `近期答對紀錄：${recent}｜最佳：${maxRecord} 題`;
+      historyEl.textContent = `近期答對紀錄：${recent}｜最佳：${maxRecord()} 題`;
     }
 
     function generateQuestion() {
@@ -126,12 +146,17 @@
       let b = Math.floor(Math.random() * 9) + 1;
       if (!isAddition && a < b) [a, b] = [b, a];
       currentAnswer = isAddition ? a + b : a - b;
-      // 限制答案必須為 1~9
       if (currentAnswer < 1 || currentAnswer > 9) {
         generateQuestion();
         return;
       }
       questionEl.textContent = `${a} ${isAddition ? "+" : "-"} ${b} = ?`;
+    }
+
+    function showGame() {
+      homeEl.classList.remove("active");
+      gameEl.classList.add("active");
+      updateHistoryDisplay();
     }
 
     function startGame() {
@@ -147,7 +172,8 @@
         if (timeLeft <= 0) {
           clearInterval(timer);
           history.push(correctCount);
-          localStorage.setItem("history", JSON.stringify(history.slice(-10)));
+          history = history.slice(-10);
+          localStorage.setItem("history", JSON.stringify(history));
           questionEl.innerHTML = `<span class='end'>時間到！你答對了 ${correctCount} 題！</span>`;
           updateHistoryDisplay();
           gameStarted = false;
