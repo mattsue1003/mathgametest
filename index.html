@@ -3,39 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>什麼加什麼等於什麼？</title>
+  <title>速算對決</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
     body {
       margin: 0;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(to top right, #ffe6cc, #ccf2ff);
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     h1 {
-      font-size: 2.2em;
-      color: #ff6600;
-      margin-bottom: 0.5em;
+      font-size: 2.5em;
+      margin-top: 1em;
+      margin-bottom: 0.3em;
+    }
+
+    #history {
+      font-size: 1em;
+      margin-bottom: 1em;
+      color: #ccc;
     }
 
     #question {
       font-size: 3em;
-      color: #3366cc;
-      background: #fff3e6;
-      border-radius: 20px;
-      padding: 20px 30px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      background: #1c1c1c;
+      border-radius: 15px;
+      padding: 20px 40px;
       margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
     }
 
     #info {
-      font-size: 1.5em;
+      font-size: 1.2em;
       margin-bottom: 20px;
     }
 
@@ -44,41 +49,44 @@
       grid-template-columns: repeat(3, 80px);
       gap: 15px;
       justify-content: center;
+      margin-bottom: 30px;
     }
 
     .btn {
       font-size: 1.8em;
-      background-color: #ffcc66;
+      background-color: #00d1ff;
       border: none;
-      border-radius: 50%;
+      border-radius: 10px;
       width: 70px;
       height: 70px;
-      box-shadow: 2px 4px #999;
+      color: #000;
+      font-weight: bold;
       cursor: pointer;
-      transition: transform 0.1s;
+      transition: all 0.2s;
     }
 
     .btn:active {
       transform: scale(0.95);
-      box-shadow: none;
+      background-color: #00a3cc;
     }
 
     .end {
-      color: red;
-      font-size: 1.8em;
+      color: #ff6666;
+      font-size: 1.5em;
     }
 
     footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 0.9em;
+      margin-top: auto;
+      font-size: 0.8em;
       color: #999;
+      padding-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>什麼加什麼等於什麼？</h1>
-  <div id="question">點數字開始遊戲</div>
+  <h1>速算對決</h1>
+  <div id="history">近期答對紀錄：--｜--｜--｜最佳：--</div>
+  <div id="question">請按任一數字鍵開始</div>
   <div id="info">剩餘時間：30 秒｜答對：0 題</div>
   <div class="num-buttons">
     <button class="btn">1</button>
@@ -91,7 +99,7 @@
     <button class="btn">8</button>
     <button class="btn">9</button>
   </div>
-  <footer>© 2025 可愛數學小遊戲</footer>
+  <footer>© 2025 速算對決</footer>
 
   <script>
     let timeLeft = 30;
@@ -99,16 +107,31 @@
     let currentAnswer = 0;
     let timer;
     let gameStarted = false;
+    let history = JSON.parse(localStorage.getItem("history") || "[]");
+    const maxRecord = Math.max(...history, 0);
 
     const questionEl = document.getElementById("question");
     const infoEl = document.getElementById("info");
+    const historyEl = document.getElementById("history");
     const buttons = document.querySelectorAll(".btn");
 
+    function updateHistoryDisplay() {
+      const recent = [...history].slice(-3).reverse().map(v => `${v} 題`).join("｜") || "--";
+      historyEl.textContent = `近期答對紀錄：${recent}｜最佳：${maxRecord} 題`;
+    }
+
     function generateQuestion() {
-      const a = Math.floor(Math.random() * 8) + 1;
-      const b = Math.floor(Math.random() * 8) + 1;
-      currentAnswer = a + b;
-      questionEl.textContent = `${a} + ${b} = ?`;
+      const isAddition = Math.random() > 0.5;
+      let a = Math.floor(Math.random() * 9) + 1;
+      let b = Math.floor(Math.random() * 9) + 1;
+      if (!isAddition && a < b) [a, b] = [b, a];
+      currentAnswer = isAddition ? a + b : a - b;
+      // 限制答案必須為 1~9
+      if (currentAnswer < 1 || currentAnswer > 9) {
+        generateQuestion();
+        return;
+      }
+      questionEl.textContent = `${a} ${isAddition ? "+" : "-"} ${b} = ?`;
     }
 
     function startGame() {
@@ -123,7 +146,10 @@
         infoEl.textContent = `剩餘時間：${timeLeft} 秒｜答對：${correctCount} 題`;
         if (timeLeft <= 0) {
           clearInterval(timer);
+          history.push(correctCount);
+          localStorage.setItem("history", JSON.stringify(history.slice(-10)));
           questionEl.innerHTML = `<span class='end'>時間到！你答對了 ${correctCount} 題！</span>`;
+          updateHistoryDisplay();
           gameStarted = false;
         }
       }, 1000);
@@ -143,6 +169,8 @@
         infoEl.textContent = `剩餘時間：${timeLeft} 秒｜答對：${correctCount} 題`;
       });
     });
+
+    updateHistoryDisplay();
   </script>
 </body>
 </html>
