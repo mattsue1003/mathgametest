@@ -167,16 +167,19 @@
     <div id="question">請按任一數字鍵開始</div>
     <div id="info">剩餘時間：30 秒｜答對：0 題</div>
     <div class="num-buttons">
-      <button class="btn">1</button>
-      <button class="btn">2</button>
-      <button class="btn">3</button>
-      <button class="btn">4</button>
-      <button class="btn">5</button>
-      <button class="btn">6</button>
-      <button class="btn">7</button>
-      <button class="btn">8</button>
-      <button class="btn">9</button>
-    </div>
+  <button class="btn">1</button>
+  <button class="btn">2</button>
+  <button class="btn">3</button>
+  <button class="btn">4</button>
+  <button class="btn">5</button>
+  <button class="btn">6</button>
+  <button class="btn">7</button>
+  <button class="btn">8</button>
+  <button class="btn">9</button>
+  <button class="btn">10</button>
+  <button class="btn">11</button>
+  <button class="btn">12</button>
+</div>
     <button id="backBtn" class="back-btn" style="display: none" onclick="backToHome()">返回首頁</button>
   </div>
   <footer>© 2025 速算對決</footer>
@@ -217,7 +220,7 @@
   let a, b;
 
   const isHard = window.difficulty === 'hard';
-  const max = isHard ? 12 : 9;
+  const max = isHard ? 99 : 20;
   const min = 1;
 
   if (operator === '+') {
@@ -239,7 +242,7 @@
     a = b * currentAnswer;
   }
 
-  if (currentAnswer < 1 || currentAnswer > 9) {
+  if (currentAnswer < 1 || currentAnswer > 12) {
   generateQuestion();
   return;
 }
