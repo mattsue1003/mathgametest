@@ -264,6 +264,9 @@
   const buttonContainer = document.getElementById("answerButtons");
   buttonContainer.innerHTML = "";
   const maxBtn = level === 'hard' ? 12 : 9;
+  buttonContainer.style.gridTemplateColumns = level === 'hard'
+    ? 'repeat(4, minmax(50px, 70px))'
+    : 'repeat(3, minmax(50px, 70px))';
   for (let i = 1; i <= maxBtn; i++) {
     const btn = document.createElement("button");
     btn.className = "btn";
